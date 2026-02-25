@@ -36,7 +36,7 @@ const mockShipments = {
 
 // POST /api/shipment
 app.post('/api/shipment', (req, res) => {
-  const { shipmentId, shipmentType, attributes, comments } = req.body;
+  const { shipmentId, shipmentType, templateType, carriers, attributes, comments } = req.body;
 
   // Validate request
   if (!shipmentId || !shipmentType) {
@@ -45,10 +45,24 @@ app.post('/api/shipment', (req, res) => {
     });
   }
 
+  if (!templateType) {
+    return res.status(400).json({
+      error: 'Missing required field: templateType'
+    });
+  }
+
+  if (!carriers || carriers.length === 0) {
+    return res.status(400).json({
+      error: 'Missing required field: carriers (must select at least one carrier)'
+    });
+  }
+
   // Log the request
   console.log('\n📦 Shipment Request Received:');
   console.log('  ID:', shipmentId);
   console.log('  Type:', shipmentType);
+  console.log('  Template Type:', templateType);
+  console.log('  Carriers:', carriers.join(', '));
   console.log('  Attributes:', attributes || []);
   console.log('  Comments:', comments || 'None');
 

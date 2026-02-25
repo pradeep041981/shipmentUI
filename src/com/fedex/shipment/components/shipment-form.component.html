@@ -39,6 +39,44 @@
         </div>
       </div>
 
+      <!-- Template Type Dropdown -->
+      <div class="form-group">
+        <label for="templateType">Template Type <span class="required">*</span></label>
+        <select
+          id="templateType"
+          class="form-control"
+          formControlName="templateType"
+          required
+        >
+          <option value="" disabled>Select a template type</option>
+          <option *ngFor="let template of templateTypes" [value]="template.value">
+            {{ template.label }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="shipmentForm.get('templateType')?.invalid && shipmentForm.get('templateType')?.touched">
+          Template Type is required
+        </div>
+      </div>
+
+      <!-- Carrier Multi-Select Dropdown -->
+      <div class="form-group">
+        <label for="carriers">Carrier <span class="required">*</span></label>
+        <select
+          id="carriers"
+          class="form-control"
+          formControlName="carriers"
+          multiple
+          required
+        >
+          <option *ngFor="let carrier of carriers" [value]="carrier.value">
+            {{ carrier.label }}
+          </option>
+        </select>
+        <div class="error-message" *ngIf="shipmentForm.get('carriers')?.invalid && shipmentForm.get('carriers')?.touched">
+          Carrier is required
+        </div>
+      </div>
+
       <!-- Attributes Checkboxes -->
       <div class="form-group">
         <label>Attributes</label>

@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { ShipmentFormComponent } from './components/shipment-form.component';
+import { ShipmentFormComponent } from './shipment/components/shipment-form.component';
 
 @Component({
-  selector: 'app-root',
+  selector: 'com-fedex-root',
   imports: [RouterOutlet, ShipmentFormComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'

@@ -5,6 +5,8 @@ import { Observable } from 'rxjs';
 export interface ShipmentRequest {
   shipmentId: string;
   shipmentType: string;
+  templateType: string;
+  carriers: string[];
   attributes: string[];
   comments: string;
 }

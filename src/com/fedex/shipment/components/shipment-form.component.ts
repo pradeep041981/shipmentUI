@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { ShipmentService, ShipmentResponse } from '../services/shipment.service';
 
 @Component({
-  selector: 'app-shipment-form',
+  selector: 'com-fedex-shipment-form',
   standalone: true,
   imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './shipment-form.component.html',
@@ -21,6 +21,16 @@ export class ShipmentFormComponent {
     { label: 'Domestic', value: 'domestic' },
     { label: 'International', value: 'international' }
   ];
+  templateTypes = [
+    { label: 'Default', value: 'default' },
+    { label: 'Temporary', value: 'temporary' }
+  ];
+  carriers = [
+    { label: 'DHL', value: 'dhl' },
+    { label: 'Fedex', value: 'fedex' },
+    { label: 'UPS', value: 'ups' },
+    { label: 'DTH', value: 'dth' }
+  ];
 
   constructor(
     private fb: FormBuilder,
@@ -29,6 +39,8 @@ export class ShipmentFormComponent {
     this.shipmentForm = this.fb.group({
       shipmentId: ['', [Validators.required]],
       shipmentType: ['', [Validators.required]],
+      templateType: ['', [Validators.required]],
+      carriers: [[], [Validators.required]],
       attr1: [false],
       attr2: [false],
       attr3: [false],
@@ -52,6 +64,8 @@ export class ShipmentFormComponent {
     const requestPayload = {
       shipmentId: formValue.shipmentId,
       shipmentType: formValue.shipmentType,
+      templateType: formValue.templateType,
+      carriers: formValue.carriers,
       attributes: selectedAttributes,
       comments: formValue.comments
     };
