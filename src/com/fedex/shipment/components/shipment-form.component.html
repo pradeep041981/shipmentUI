@@ -12,31 +12,35 @@
           class="form-control"
           formControlName="shipmentId"
           placeholder="Enter shipment ID"
-          required
-        />
-        <div class="error-message" *ngIf="shipmentForm.get('shipmentId')?.invalid && shipmentForm.get('shipmentId')?.touched">
+          required/>
+        @if (shipmentForm.get('shipmentId')?.invalid && shipmentForm.get('shipmentId')?.touched) {
+          <div class="error-message">
           Shipment ID is required
         </div>
+        }
       </div>
 
       <!-- Shipment Type Radio Buttons -->
       <div class="form-group">
         <label>Shipment Type <span class="required">*</span></label>
         <div class="radio-group">
-          <div class="radio-option" *ngFor="let type of shipmentTypes">
-            <input
-              type="radio"
-              [id]="type.value"
-              [value]="type.value"
-              formControlName="shipmentType"
-              required
-            />
-            <label [for]="type.value">{{ type.label }}</label>
-          </div>
+          @for (type of shipmentTypes; track type.value) {
+            <div class="radio-option">
+              <input
+                type="radio"
+                [id]="type.value"
+                [value]="type.value"
+                formControlName="shipmentType"
+                required/>
+              <label [for]="type.value">{{ type.label }}</label>
+            </div>
+          }
         </div>
-        <div class="error-message" *ngIf="shipmentForm.get('shipmentType')?.invalid && shipmentForm.get('shipmentType')?.touched">
+        @if (shipmentForm.get('shipmentType')?.invalid && shipmentForm.get('shipmentType')?.touched) {
+          <div class="error-message">
           Shipment Type is required
         </div>
+        }
       </div>
 
       <!-- Template Type Dropdown -->
@@ -46,16 +50,19 @@
           id="templateType"
           class="form-control"
           formControlName="templateType"
-          required
-        >
+          required>
           <option value="" disabled>Select a template type</option>
-          <option *ngFor="let template of templateTypes" [value]="template.value">
+          @for (template of templateTypes; track template.value) {
+            <option [value]="template.value">
             {{ template.label }}
           </option>
+          }
         </select>
-        <div class="error-message" *ngIf="shipmentForm.get('templateType')?.invalid && shipmentForm.get('templateType')?.touched">
+        @if (shipmentForm.get('templateType')?.invalid && shipmentForm.get('templateType')?.touched) {
+          <div class="error-message">
           Template Type is required
         </div>
+        }
       </div>
 
       <!-- Carrier Multi-Select Dropdown -->
@@ -66,29 +73,33 @@
           class="form-control"
           formControlName="carriers"
           multiple
-          required
-        >
-          <option *ngFor="let carrier of carriers" [value]="carrier.value">
+          required>
+          @for (carrier of carriers; track carrier.value) {
+            <option [value]="carrier.value">
             {{ carrier.label }}
           </option>
+          }
         </select>
-        <div class="error-message" *ngIf="shipmentForm.get('carriers')?.invalid && shipmentForm.get('carriers')?.touched">
+        @if (shipmentForm.get('carriers')?.invalid && shipmentForm.get('carriers')?.touched) {
+          <div class="error-message">
           Carrier is required
         </div>
+        }
       </div>
 
       <!-- Attributes Checkboxes -->
       <div class="form-group">
         <label>Attributes</label>
         <div class="checkbox-group">
-          <div class="checkbox-option" *ngFor="let attr of attributes">
+          @for (attr of attributes; track attr) {
+            <div class="checkbox-option">
             <input
               type="checkbox"
               [id]="attr"
-              [formControlName]="attr"
-            />
+              [formControlName]="attr"/>
             <label [for]="attr">{{ attr }}</label>
           </div>
+          }
         </div>
       </div>
 
@@ -100,8 +111,7 @@
           class="form-control textarea"
           formControlName="comments"
           placeholder="Enter any additional comments"
-          rows="4"
-        ></textarea>
+          rows="4"></textarea>
       </div>
 
       <!-- Action Buttons -->
@@ -109,28 +119,62 @@
         <button
           type="submit"
           class="btn btn-primary"
-          [disabled]="shipmentForm.invalid || isLoading()"
-        >
+          [disabled]="shipmentForm.invalid || isLoading()">
           {{ isLoading() ? 'Submitting...' : 'Submit' }}
         </button>
         <button
           type="button"
           class="btn btn-secondary"
-          (click)="resetForm()"
-        >
+          (click)="resetForm()">
           Reset
         </button>
       </div>
     </form>
 
     <!-- Error Message Display -->
-    <div class="error-alert" *ngIf="errorMessage()">
-      <strong>Error:</strong> {{ errorMessage() }}
-    </div>
+    @if (errorMessage()) {
+      <div class="error-alert">
+        <div class="error-header">
+          <strong>❌ Error:</strong> {{ errorMessage() }}
+        </div>
+
+        <!-- Detailed Error Response from Backend -->
+        @if (errorResponse()) {
+          <div class="error-details">
+            <h4>Error Details:</h4>
+            <div class="error-detail-row">
+              <span class="error-label">Status Code:</span>
+              <span class="error-value">{{ errorResponse()!.status }}</span>
+            </div>
+            <div class="error-detail-row">
+              <span class="error-label">Error Type:</span>
+              <span class="error-value">{{ errorResponse()!.error }}</span>
+            </div>
+            <div class="error-detail-row">
+              <span class="error-label">Message:</span>
+              <span class="error-value">{{ errorResponse()!.message }}</span>
+            </div>
+            @if (errorResponse()!.path) {
+              <div class="error-detail-row">
+                <span class="error-label">Endpoint:</span>
+                <span class="error-value">{{ errorResponse()!.path }}</span>
+              </div>
+            }
+            @if (errorResponse()!.timestamp) {
+              <div class="error-detail-row">
+                <span class="error-label">Timestamp:</span>
+                <span class="error-value">{{ errorResponse()!.timestamp }}</span>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
   </div>
 
   <!-- Results Table Section -->
-  <div class="results-section" *ngIf="shipmentResults()">
+  @if (shipmentResults()) {
+    <div class="results-section">
     <h2>Shipment Tracking Results</h2>
     <table class="results-table">
       <thead>
@@ -142,14 +186,17 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let result of shipmentResults()">
+        @for (result of shipmentResults(); track result.shipmentId) {
+          <tr>
           <td>{{ result.shipmentId }}</td>
           <td>{{ result.origin }}</td>
           <td>{{ result.destination }}</td>
           <td>{{ result.trackStatus }}</td>
         </tr>
+        }
       </tbody>
     </table>
   </div>
+  }
 </div>
 

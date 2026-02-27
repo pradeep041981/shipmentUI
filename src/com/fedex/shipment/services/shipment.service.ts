@@ -18,6 +18,14 @@ export interface ShipmentResponse {
   trackStatus: string;
 }
 
+export interface ErrorResponse {
+  timestamp: string;
+  status: number;
+  error: string;
+  message: string;
+  path?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })

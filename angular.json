@@ -3,7 +3,10 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "analytics": false
+    "analytics": false,
+    "schematicCollections": [
+      "playwright-ng-schematics"
+    ]
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -72,6 +75,17 @@
         },
         "test": {
           "builder": "@angular/build:unit-test"
+        },
+        "e2e": {
+          "builder": "playwright-ng-schematics:playwright",
+          "options": {
+            "devServerTarget": "my-angular-app:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "my-angular-app:serve:production"
+            }
+          }
         }
       }
     }

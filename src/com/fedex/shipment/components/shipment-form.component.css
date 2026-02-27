@@ -157,6 +157,58 @@ label {
   font-size: 0.9rem;
 }
 
+.error-header {
+  font-weight: 600;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.error-details {
+  background-color: #f5e6e3;
+  padding: 12px 15px;
+  margin-top: 12px;
+  border-radius: 3px;
+  border: 1px solid #d7bdb5;
+}
+
+.error-details h4 {
+  margin: 0 0 10px 0;
+  font-size: 0.9rem;
+  color: #c0392b;
+  text-decoration: underline;
+}
+
+.error-detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid #e8d4ce;
+  gap: 15px;
+}
+
+.error-detail-row:last-child {
+  border-bottom: none;
+}
+
+.error-label {
+  font-weight: 600;
+  color: #a93226;
+  flex-shrink: 0;
+  min-width: 120px;
+}
+
+.error-value {
+  color: #641e16;
+  word-break: break-word;
+  flex-grow: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  padding: 4px 8px;
+  background-color: #fae3dd;
+  border-radius: 2px;
+}
+
 /* Results Table Styles */
 .results-table {
   width: 100%;

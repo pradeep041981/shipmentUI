@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { ShipmentService, ShipmentResponse } from '../services/shipment.service';
+import { ShipmentService, ShipmentResponse, ErrorResponse } from '../services/shipment.service';
 
 @Component({
   selector: 'com-fedex-shipment-form',
@@ -15,6 +15,7 @@ export class ShipmentFormComponent {
   shipmentResults = signal<ShipmentResponse[] | null>(null);
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
+  errorResponse = signal<ErrorResponse | null>(null);
 
   attributes = ['attr1', 'attr2', 'attr3'];
   shipmentTypes = [
@@ -72,6 +73,7 @@ export class ShipmentFormComponent {
 
     this.isLoading.set(true);
     this.errorMessage.set(null);
+    this.errorResponse.set(null);
 
     this.shipmentService.submitShipment(requestPayload).subscribe({
       next: (response) => {
@@ -80,8 +82,20 @@ export class ShipmentFormComponent {
       },
       error: (error) => {
         console.error('Error submitting shipment:', error);
-        this.errorMessage.set('Failed to submit shipment. Please check the backend service.');
         this.isLoading.set(false);
+
+        // Check if error response comes from backend
+        if (error.error && typeof error.error === 'object') {
+          const backendError = error.error as ErrorResponse;
+          this.errorResponse.set(backendError);
+          this.errorMessage.set(backendError.message || 'An error occurred while submitting shipment.');
+        } else if (error.status) {
+          // Handle HTTP errors without proper error body
+          this.errorMessage.set(`HTTP Error ${error.status}: ${error.statusText}`);
+        } else {
+          // Handle network or other errors
+          this.errorMessage.set('Failed to submit shipment. Please check the backend service.');
+        }
       }
     });
   }
@@ -90,6 +104,7 @@ export class ShipmentFormComponent {
     this.shipmentForm.reset();
     this.shipmentResults.set(null);
     this.errorMessage.set(null);
+    this.errorResponse.set(null);
   }
 }
 
