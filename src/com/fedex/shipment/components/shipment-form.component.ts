@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, computed } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ShipmentService, ShipmentResponse, ErrorResponse } from '../services/shipment.service';
@@ -16,6 +16,10 @@ export class ShipmentFormComponent {
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
   errorResponse = signal<ErrorResponse | null>(null);
+  fieldErrorsMap = signal<Map<string, string>>(new Map());
+
+  // Computed signal to track if there are any field errors
+  hasFieldErrors = computed(() => this.fieldErrorsMap().size > 0);
 
   attributes = ['attr1', 'attr2', 'attr3'];
   shipmentTypes = [
@@ -74,6 +78,7 @@ export class ShipmentFormComponent {
     this.isLoading.set(true);
     this.errorMessage.set(null);
     this.errorResponse.set(null);
+    this.fieldErrorsMap.set(new Map());
 
     this.shipmentService.submitShipment(requestPayload).subscribe({
       next: (response) => {
@@ -89,6 +94,9 @@ export class ShipmentFormComponent {
           const backendError = error.error as ErrorResponse;
           this.errorResponse.set(backendError);
           this.errorMessage.set(backendError.message || 'An error occurred while submitting shipment.');
+
+          // Parse field-level errors from the message
+          this.extractFieldErrors(backendError.message);
         } else if (error.status) {
           // Handle HTTP errors without proper error body
           this.errorMessage.set(`HTTP Error ${error.status}: ${error.statusText}`);
@@ -100,11 +108,61 @@ export class ShipmentFormComponent {
     });
   }
 
+  /**
+   * Extract field-level errors from backend error message
+   * Expected format: "fieldName: errorMessage, fieldName2: errorMessage2"
+   * Example: "shipmentId: must not be empty, carriers: must not be empty"
+   */
+  private extractFieldErrors(errorMessage: string): void {
+    const errorMap = new Map<string, string>();
+
+    if (!errorMessage || typeof errorMessage !== 'string') {
+      this.fieldErrorsMap.set(errorMap);
+      return;
+    }
+
+    // Split by comma to get individual field errors
+    const fieldErrorPairs = errorMessage.split(',').map(pair => pair.trim());
+
+    fieldErrorPairs.forEach(pair => {
+      // Find the first colon to split field name from error message
+      const colonIndex = pair.indexOf(':');
+
+      if (colonIndex > 0) {
+        const fieldName = pair.substring(0, colonIndex).trim();
+        const errorMsg = pair.substring(colonIndex + 1).trim();
+
+        if (fieldName && errorMsg) {
+          errorMap.set(fieldName, errorMsg);
+        }
+      }
+    });
+
+    this.fieldErrorsMap.set(errorMap);
+  }
+
+  /**
+   * Get error message for a specific field
+   * Returns the error string if it exists, undefined otherwise
+   */
+  getFieldError(fieldName: string): string | undefined {
+    const error = this.fieldErrorsMap().get(fieldName);
+    return error ? error : undefined;
+  }
+
+  /**
+   * Check if a specific field has an error
+   */
+  hasFieldError(fieldName: string): boolean {
+    return this.fieldErrorsMap().has(fieldName);
+  }
+
   resetForm(): void {
     this.shipmentForm.reset();
     this.shipmentResults.set(null);
     this.errorMessage.set(null);
     this.errorResponse.set(null);
+    this.fieldErrorsMap.set(new Map());
   }
 }
 

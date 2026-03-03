@@ -3,10 +3,9 @@ import { RouterOutlet } from '@angular/router';
 import { ShipmentFormComponent } from './components/shipment-form.component';
 
 @Component({
-  selector: 'com-fedex-shipment-root',
+  selector: 'com-fedex-root',
   imports: [RouterOutlet, ShipmentFormComponent],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App {}
-

@@ -105,6 +105,32 @@ label {
   display: block;
 }
 
+.error-message.backend-error {
+  color: #c0392b;
+  font-weight: 600;
+  padding: 6px 10px;
+  background-color: #fadbd8;
+  border-left: 3px solid #e74c3c;
+  border-radius: 2px;
+  margin-top: 8px;
+  font-size: 0.9rem;
+}
+
+/* Visual indication for fields with backend errors */
+.form-control.has-error {
+  border-color: #e74c3c !important;
+  background-color: #fef5f5;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.radio-group.has-error,
+.checkbox-group.has-error {
+  padding: 8px;
+  background-color: #fef5f5;
+  border-left: 3px solid #e74c3c;
+  border-radius: 2px;
+}
+
 .button-group {
   display: flex;
   gap: 10px;

@@ -10,20 +10,25 @@
           type="text"
           id="shipmentId"
           class="form-control"
+          [class.has-error]="hasFieldError('shipmentId')"
           formControlName="shipmentId"
           placeholder="Enter shipment ID"
           required/>
-        @if (shipmentForm.get('shipmentId')?.invalid && shipmentForm.get('shipmentId')?.touched) {
+        @if (hasFieldError('shipmentId')) {
+          <div class="error-message backend-error">
+            {{ getFieldError('shipmentId') }}
+          </div>
+        } @else if (shipmentForm.get('shipmentId')?.invalid && shipmentForm.get('shipmentId')?.touched) {
           <div class="error-message">
-          Shipment ID is required
-        </div>
+            Shipment ID is required
+          </div>
         }
       </div>
 
       <!-- Shipment Type Radio Buttons -->
       <div class="form-group">
         <label>Shipment Type <span class="required">*</span></label>
-        <div class="radio-group">
+        <div class="radio-group" [class.has-error]="hasFieldError('shipmentType')">
           @for (type of shipmentTypes; track type.value) {
             <div class="radio-option">
               <input
@@ -36,10 +41,14 @@
             </div>
           }
         </div>
-        @if (shipmentForm.get('shipmentType')?.invalid && shipmentForm.get('shipmentType')?.touched) {
+        @if (hasFieldError('shipmentType')) {
+          <div class="error-message backend-error">
+            {{ getFieldError('shipmentType') }}
+          </div>
+        } @else if (shipmentForm.get('shipmentType')?.invalid && shipmentForm.get('shipmentType')?.touched) {
           <div class="error-message">
-          Shipment Type is required
-        </div>
+            Shipment Type is required
+          </div>
         }
       </div>
 
@@ -49,6 +58,7 @@
         <select
           id="templateType"
           class="form-control"
+          [class.has-error]="hasFieldError('templateType')"
           formControlName="templateType"
           required>
           <option value="" disabled>Select a template type</option>
@@ -58,10 +68,14 @@
           </option>
           }
         </select>
-        @if (shipmentForm.get('templateType')?.invalid && shipmentForm.get('templateType')?.touched) {
+        @if (hasFieldError('templateType')) {
+          <div class="error-message backend-error">
+            {{ getFieldError('templateType') }}
+          </div>
+        } @else if (shipmentForm.get('templateType')?.invalid && shipmentForm.get('templateType')?.touched) {
           <div class="error-message">
-          Template Type is required
-        </div>
+            Template Type is required
+          </div>
         }
       </div>
 
@@ -71,6 +85,7 @@
         <select
           id="carriers"
           class="form-control"
+          [class.has-error]="hasFieldError('carriers')"
           formControlName="carriers"
           multiple
           required>
@@ -80,17 +95,21 @@
           </option>
           }
         </select>
-        @if (shipmentForm.get('carriers')?.invalid && shipmentForm.get('carriers')?.touched) {
+        @if (hasFieldError('carriers')) {
+          <div class="error-message backend-error">
+            {{ getFieldError('carriers') }}
+          </div>
+        } @else if (shipmentForm.get('carriers')?.invalid && shipmentForm.get('carriers')?.touched) {
           <div class="error-message">
-          Carrier is required
-        </div>
+            Carrier is required
+          </div>
         }
       </div>
 
       <!-- Attributes Checkboxes -->
       <div class="form-group">
         <label>Attributes</label>
-        <div class="checkbox-group">
+        <div class="checkbox-group" [class.has-error]="hasFieldError('attributes')">
           @for (attr of attributes; track attr) {
             <div class="checkbox-option">
             <input
@@ -101,6 +120,11 @@
           </div>
           }
         </div>
+        @if (hasFieldError('attributes')) {
+          <div class="error-message backend-error">
+            {{ getFieldError('attributes') }}
+          </div>
+        }
       </div>
 
       <!-- Comments Textarea -->
