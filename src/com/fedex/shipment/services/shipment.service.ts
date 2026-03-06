@@ -30,7 +30,7 @@ export interface ErrorResponse {
   providedIn: 'root'
 })
 export class ShipmentService {
-  private apiUrl = 'http://localhost:8080/api/shipment';
+  private apiUrl = '/api/shipment';
 
   constructor(private http: HttpClient) {}
 

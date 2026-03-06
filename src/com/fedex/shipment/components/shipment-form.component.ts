@@ -2,6 +2,7 @@ import { Component, signal, computed } from '@angular/core';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ShipmentService, ShipmentResponse, ErrorResponse } from '../services/shipment.service';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'com-fedex-shipment-form',
@@ -39,7 +40,8 @@ export class ShipmentFormComponent {
 
   constructor(
     private fb: FormBuilder,
-    private shipmentService: ShipmentService
+    private shipmentService: ShipmentService,
+    private authService: AuthService
   ) {
     this.shipmentForm = this.fb.group({
       shipmentId: ['', [Validators.required]],
@@ -97,6 +99,9 @@ export class ShipmentFormComponent {
 
           // Parse field-level errors from the message
           this.extractFieldErrors(backendError.message);
+        } else if (error.status === 401 || error.status === 403) {
+          // Session expired or not authenticated – redirect to Google SSO
+          this.authService.login();
         } else if (error.status) {
           // Handle HTTP errors without proper error body
           this.errorMessage.set(`HTTP Error ${error.status}: ${error.statusText}`);

@@ -1,3 +1,17 @@
+@if (authService.isAuthenticated()) {
+  <nav class="app-nav">
+    <div class="nav-brand">
+      <span class="logo-fed">Fed</span><span class="logo-ex">Ex</span>
+      <span class="nav-title">Shipment Tracking</span>
+    </div>
+    <div class="nav-user">
+      @if (authService.currentUser()?.picture) {
+        <img [src]="authService.currentUser()!.picture" alt="Profile" class="user-avatar" />
+      }
+      <span class="user-name">{{ authService.currentUser()?.name }}</span>
+      <button class="btn-logout" (click)="logout()">Sign Out</button>
+    </div>
+  </nav>
+}
 
-<com-fedex-shipment-form></com-fedex-shipment-form>
 <router-outlet />
