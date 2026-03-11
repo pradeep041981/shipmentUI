@@ -6,37 +6,39 @@ import {
   HttpRequest
 } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { AuthService } from '../services/auth.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppIdInterceptor implements HttpInterceptor {
   private readonly APP_ID = 'shipmentUI';
-  // Match both relative URLs (proxied via dev server) and absolute backend URL
   private readonly BACKEND_ORIGIN = 'http://localhost:8080';
   private readonly PROXIED_PATHS = ['/api/', '/auth/', '/oauth2/', '/login', '/logout'];
 
+  constructor(private authService: AuthService) {}
+
   intercept(
-    request: HttpRequest<any>,
+    request: HttpRequest<unknown>,
     next: HttpHandler
-  ): Observable<HttpEvent<any>> {
+  ): Observable<HttpEvent<unknown>> {
     const isBackendRequest =
       request.url.startsWith(this.BACKEND_ORIGIN) ||
       this.PROXIED_PATHS.some(path => request.url.startsWith(path));
 
-    // Apply headers and withCredentials only for requests to the backend
     if (isBackendRequest) {
-      const clonedRequest = request.clone({
-        setHeaders: {
-          'X-App-Id': this.APP_ID
-        },
-        withCredentials: true
-      });
-      console.log('AppIdInterceptor: Added X-App-Id header and withCredentials to request:', clonedRequest.url);
+      const token = this.authService.getToken();
+      const headers: Record<string, string> = { 'X-App-Id': this.APP_ID };
+
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const clonedRequest = request.clone({ setHeaders: headers });
+      console.log('AppIdInterceptor: Added JWT Bearer token + X-App-Id to request:', clonedRequest.url);
       return next.handle(clonedRequest);
     }
 
     return next.handle(request);
   }
 }
-

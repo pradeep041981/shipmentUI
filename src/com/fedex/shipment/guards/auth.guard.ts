@@ -1,26 +1,17 @@
 import { inject } from '@angular/core';
-import { CanActivateFn } from '@angular/router';
+import { CanActivateFn, Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { map } from 'rxjs';
 
 export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
+  const router = inject(Router);
 
-  // If already checked and authenticated, allow immediately
-  if (authService.isAuthenticated()) {
+  if (authService.isAuthenticated() && !authService.isTokenExpired()) {
     return true;
   }
 
-  // Otherwise check with backend; redirect to login if not authenticated
-  return authService.checkAuthStatus().pipe(
-    map(user => {
-      if (user && (user as any).authenticated !== false && authService.isAuthenticated()) {
-        return true;
-      }
-      // Not authenticated – trigger Google login redirect
-      authService.login();
-      return false;
-    })
-  );
+  // Token missing or expired – clear stale state and go to login
+  authService.clearToken();
+  router.navigate(['/login']);
+  return false;
 };
-

@@ -1,6 +1,4 @@
 import { Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, tap, catchError, of } from 'rxjs';
 
 export interface UserInfo {
   name: string;
@@ -14,57 +12,93 @@ export interface UserInfo {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly apiBase = '';
+  private readonly TOKEN_KEY = 'jwt_token';
 
   currentUser = signal<UserInfo | null>(null);
   isAuthenticated = signal<boolean>(false);
-  isLoading = signal<boolean>(false);
 
-  constructor(private http: HttpClient) {}
-
-  /**
-   * Checks authentication status with the backend.
-   * Uses session cookie (withCredentials).
-   */
-  checkAuthStatus(): Observable<UserInfo> {
-    this.isLoading.set(true);
-    return this.http.get<UserInfo>(`${this.apiBase}/auth/me`, { withCredentials: true }).pipe(
-      tap(user => {
-        this.currentUser.set(user);
-        this.isAuthenticated.set(true);
-        this.isLoading.set(false);
-      }),
-      catchError(() => {
-        this.currentUser.set(null);
-        this.isAuthenticated.set(false);
-        this.isLoading.set(false);
-        return of({ authenticated: false } as unknown as UserInfo);
-      })
-    );
+  constructor() {
+    // Restore auth state from localStorage on service initialization
+    this.loadFromStorage();
   }
 
-  /**
-   * Initiates Google SSO login by redirecting to the backend OAuth2 endpoint.
-   */
+  // ── Token helpers ──────────────────────────��─────────────────────────────────
+
+  getToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
+  }
+
+  setToken(token: string): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
+    const decoded = this.decodeToken(token);
+    if (decoded) {
+      this.currentUser.set({
+        name:          (decoded['name']    as string) ?? '',
+        email:         (decoded['email']   as string) ?? (decoded['sub'] as string) ?? '',
+        picture:       (decoded['picture'] as string) ?? '',
+        sub:           (decoded['sub']     as string) ?? '',
+        authenticated: true
+      });
+      this.isAuthenticated.set(true);
+    }
+  }
+
+  clearToken(): void {
+    localStorage.removeItem(this.TOKEN_KEY);
+    this.currentUser.set(null);
+    this.isAuthenticated.set(false);
+  }
+
+  isTokenExpired(token?: string): boolean {
+    const t = token ?? this.getToken();
+    if (!t) return true;
+    const decoded = this.decodeToken(t);
+    if (!decoded?.['exp']) return true;
+    return Date.now() >= (decoded['exp'] as number) * 1000;
+  }
+
+  // ── Auth actions ─────────────────────────────────────────────────────────────
+
+  /** Redirect to Google OAuth2 (backend initiates the flow). */
   login(): void {
-    window.location.href = `${this.apiBase}/oauth2/authorize/google`;
+    window.location.href = '/oauth2/authorize/google';
+  }
+
+  /** Clear the stored JWT – no backend call required. */
+  logout(): void {
+    this.clearToken();
+  }
+
+  // ── Private helpers ──────────────────────────────────────────────────────────
+
+  private loadFromStorage(): void {
+    const token = this.getToken();
+    if (token && !this.isTokenExpired(token)) {
+      const decoded = this.decodeToken(token);
+      if (decoded) {
+        this.currentUser.set({
+          name:          (decoded['name']    as string) ?? '',
+          email:         (decoded['email']   as string) ?? (decoded['sub'] as string) ?? '',
+          picture:       (decoded['picture'] as string) ?? '',
+          sub:           (decoded['sub']     as string) ?? '',
+          authenticated: true
+        });
+        this.isAuthenticated.set(true);
+      }
+    }
   }
 
   /**
-   * Logs the user out by calling the backend logout endpoint, then reloads.
+   * Base64url-decode the JWT payload without verifying the signature.
+   * Signature verification happens on the backend on every API request.
    */
-  logout(): Observable<any> {
-    return this.http.post(`${this.apiBase}/logout`, {}, { withCredentials: true }).pipe(
-      tap(() => {
-        this.currentUser.set(null);
-        this.isAuthenticated.set(false);
-      }),
-      catchError(() => {
-        this.currentUser.set(null);
-        this.isAuthenticated.set(false);
-        return of(null);
-      })
-    );
+  private decodeToken(token: string): Record<string, unknown> | null {
+    try {
+      const payload = token.split('.')[1];
+      const json = atob(payload.replace(/-/g, '+').replace(/_/g, '/'));
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
   }
 }
-

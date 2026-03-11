@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from './services/auth.service';
@@ -9,17 +9,12 @@ import { AuthService } from './services/auth.service';
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App implements OnInit {
+export class App {
   constructor(public authService: AuthService) {}
 
-  ngOnInit(): void {
-    // Check session status on app startup so the guard has up-to-date info
-    this.authService.checkAuthStatus().subscribe();
-  }
-
   logout(): void {
-    this.authService.logout().subscribe(() => {
-      window.location.href = '/login';
-    });
+    // JWT logout is client-side: clear the stored token and redirect to login
+    this.authService.logout();
+    window.location.href = '/login';
   }
 }

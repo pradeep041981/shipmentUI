@@ -100,7 +100,8 @@ export class ShipmentFormComponent {
           // Parse field-level errors from the message
           this.extractFieldErrors(backendError.message);
         } else if (error.status === 401 || error.status === 403) {
-          // Session expired or not authenticated – redirect to Google SSO
+          // JWT expired or invalid – clear token and redirect to Google SSO
+          this.authService.clearToken();
           this.authService.login();
         } else if (error.status) {
           // Handle HTTP errors without proper error body
