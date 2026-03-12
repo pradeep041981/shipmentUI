@@ -6,6 +6,11 @@ export const serverRoutes: ServerRoute[] = [
     renderMode: RenderMode.Client
   },
   {
+    // OAuth2 callback – must be client-rendered (uses localStorage / queryParams)
+    path: 'auth/callback',
+    renderMode: RenderMode.Client
+  },
+  {
     path: '',
     renderMode: RenderMode.Client
   },
