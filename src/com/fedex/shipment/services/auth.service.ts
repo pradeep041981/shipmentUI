@@ -17,8 +17,8 @@ export class AuthService {
   private readonly USER_INFO_KEY = 'user_info';
 
   // Replace these values with your Okta app settings.
-  private readonly oktaIssuer = 'https://{yourOktaDomain}/oauth2/default';
-  private readonly oktaClientId = '{yourOktaClientId}';
+  private readonly oktaIssuer = 'https://integrator-9046183.okta.com/oauth2/default';
+  private readonly oktaClientId = '0oa14tsiceele1jiS698';
   private readonly oktaAuth = new OktaAuth({
     issuer: this.oktaIssuer,
     clientId: this.oktaClientId,
