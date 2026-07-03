@@ -14,7 +14,7 @@ import { AuthService } from '../services/auth.service';
 export class AppIdInterceptor implements HttpInterceptor {
   private readonly APP_ID = 'shipmentUI';
   private readonly BACKEND_ORIGIN = 'http://localhost:8080';
-  private readonly PROXIED_PATHS = ['/api/', '/auth/', '/oauth2/', '/login', '/logout'];
+  private readonly PROXIED_PATHS = ['/api/'];
 
   constructor(private authService: AuthService) {}
 
@@ -35,7 +35,7 @@ export class AppIdInterceptor implements HttpInterceptor {
       }
 
       const clonedRequest = request.clone({ setHeaders: headers });
-      console.log('AppIdInterceptor: Added JWT Bearer token + X-App-Id to request:', clonedRequest.url);
+      console.log('AppIdInterceptor: Added Bearer token + X-App-Id to request:', clonedRequest.url);
       return next.handle(clonedRequest);
     }
 

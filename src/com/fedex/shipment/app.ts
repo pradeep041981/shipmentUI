@@ -13,8 +13,9 @@ export class App {
   constructor(public authService: AuthService) {}
 
   logout(): void {
-    // JWT logout is client-side: clear the stored token and redirect to login
-    this.authService.logout();
-    window.location.href = '/login';
+    void this.authService.logout().catch((error) => {
+      console.error('Okta logout failed:', error);
+      window.location.href = '/login';
+    });
   }
 }

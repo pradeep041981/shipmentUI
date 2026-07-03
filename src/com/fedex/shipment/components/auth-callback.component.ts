@@ -1,12 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 
 /**
- * Handles the redirect from the backend after a successful Google OAuth2 login.
- * The backend redirects to: /auth/callback?token=<jwt>
- * This component stores the JWT and navigates to the home route.
+ * Handles the Okta OpenID Connect callback in the frontend.
  */
 @Component({
   selector: 'com-fedex-auth-callback',
@@ -50,22 +48,21 @@ export class AuthCallbackComponent implements OnInit {
   error: string | null = null;
 
   constructor(
-    private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService
   ) {}
 
   ngOnInit(): void {
-    const token = this.route.snapshot.queryParamMap.get('token');
+    void this.completeLogin();
+  }
 
-    if (token) {
-      this.authService.setToken(token);
-      // Navigate to the home (shipment form) route, removing the token from the URL
+  private async completeLogin(): Promise<void> {
+    try {
+      await this.authService.handleLoginCallback();
       this.router.navigate(['/'], { replaceUrl: true });
-    } else {
-      this.error = 'Authentication failed – no token received. Please try again.';
+    } catch {
+      this.error = 'Authentication failed. Please try signing in again.';
       setTimeout(() => this.router.navigate(['/login']), 3000);
     }
   }
 }
-

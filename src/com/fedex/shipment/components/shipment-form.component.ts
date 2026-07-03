@@ -100,9 +100,9 @@ export class ShipmentFormComponent {
           // Parse field-level errors from the message
           this.extractFieldErrors(backendError.message);
         } else if (error.status === 401 || error.status === 403) {
-          // JWT expired or invalid – clear token and redirect to Google SSO
+          // Access token expired or invalid – clear token and redirect to Okta SSO
           this.authService.clearToken();
-          this.authService.login();
+          void this.authService.login();
         } else if (error.status) {
           // Handle HTTP errors without proper error body
           this.errorMessage.set(`HTTP Error ${error.status}: ${error.statusText}`);
@@ -171,4 +171,3 @@ export class ShipmentFormComponent {
     this.fieldErrorsMap.set(new Map());
   }
 }
-
